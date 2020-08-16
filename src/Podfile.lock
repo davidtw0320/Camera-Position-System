@@ -1,0 +1,16 @@
+PODS:
+  - TensorFlowLite (1.13.1)
+
+DEPENDENCIES:
+  - TensorFlowLite (= 1.13.1)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - TensorFlowLite
+
+SPEC CHECKSUMS:
+  TensorFlowLite: 8b9dc4eb32eac0f8cb660c66bca7604da56dcc5a
+
+PODFILE CHECKSUM: 1f44a2ab814725d3675508d4a66a5efdb4140d58
+
+COCOAPODS: 1.6.1
