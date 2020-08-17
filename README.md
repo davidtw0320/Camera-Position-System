@@ -16,6 +16,33 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 
 ## Key Point
 
++ **Photo taking**
+  + Implemented photo-taking function with the IＰhone camera module to offer the real-time visual recognition.
+
+```objc
+-(IBAction)takephoto_1:(id)sender{
+    AVCaptureConnection *videoConnection=nil;
+    for (AVCaptureConnection *connection in StillImageOutput.connections) {
+        for (AVCaptureInputPort *port in [connection inputPorts]){
+            if([[port mediaType] isEqual:AVMediaTypeVideo]){
+                videoConnection =connection;
+                break;
+            }
+        }
+    }
+    [StillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error){
+        if(imageDataSampleBuffer !=NULL){
+            NSData *imageData =[AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+            UIImage *image =[UIImage imageWithData:imageData];
+            CGSize size = CGSizeMake(224, 224);
+            image_1=[self reSizeImage:[self image:image rotation:UIImageOrientationRight] toSize:size];
+            image_1=[self pointCloud:image_1];
+            self->imageView_1.image =image_1;
+        }
+    }];
+}
+```
+
 + **Simulation: a 2D picure projected from 3D point cloud model**
   + Simulated the photo took from the camera to be a picture projected from 3D point cloud model.
   + Implemented simulation in three part of the photo. There are 30%, 70%, and 30% of the picture from top to bottom separately.
@@ -91,7 +118,7 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 ```
 
 + **runModelOnFrame**
-
+  + 
 ```objc
 - (void)runModelOnFrame:(CVPixelBufferRef)pixelBuffer {
     //setup input and output
@@ -101,7 +128,6 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
     if (interpreter->Invoke() != kTfLiteOk) LOG(FATAL) << "Failed to invoke!";
     //get testing data
     float* output = interpreter->typed_output_tensor<float>(0);
-    //get the top value from the testing data
     GetTopN(output, output_size, kNumResults, kThreshold, &top_results); NSMutableDictionary* newValues = [NSMutableDictionary dictionary]; for (const auto& result : top_results) {
     const float confidence = result.first;
     NSString* labelObject = [NSString stringWithUTF8String:labels[index].c_str()]; NSNumber* valueObject = [NSNumber numberWithFloat:confidence]; [newValues setObject:valueObject forKey:labelObject];

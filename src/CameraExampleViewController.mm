@@ -472,7 +472,7 @@ UIImage *image_1;
         if(imageDataSampleBuffer !=NULL){
             NSData *imageData =[AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
             UIImage *image =[UIImage imageWithData:imageData];
-            CGSize size=CGSizeMake(224, 224);
+            CGSize size = CGSizeMake(224, 224);
             image_1=[self reSizeImage:[self image:image rotation:UIImageOrientationRight] toSize:size];
             image_1=[self pointCloud:image_1];
             self->imageView_1.image =image_1;
