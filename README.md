@@ -2,15 +2,15 @@
 
 ## Description
 
-CPS (The Camera Position System) combined Convolution Neural Network (CNN) model with IOS camera module to provide users with real-time positioning service. In the begining, users need to take photos of two continuous viewing at one place. Then, CPS merges two photos, normalizes data, and inputs the processed photos to the CNN model with TensorFlow lite interpreter. After gaining the predicting result, CPS will indicator where the user is in the environment.
+CPS (The Camera Position System) combines Convolution Neural Network (CNN) model with IOS camera module to provide users with real-time positioning service. In the beginning, users need to take photos of two continuous viewings in one place. CPS then merges two photos, normalizes data, and inputs the processed photos into the CNN model with TensorFlow Lite interpreter. After gaining the predicting result, CPS will indicate where the user is in the environment.
 
-CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning System. If you want to get  detailed information, please check the [link](https://ieeexplore.ieee.org/abstract/document/9043071).
+CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning System. If you want to get more detailed information, please check the [link](https://ieeexplore.ieee.org/abstract/document/9043071).
 
 ![image info](image/description.png)
 
 ***
 
-## Prerequsite
+## Environment
 
 + Xcode version 11.6
 
@@ -20,9 +20,9 @@ CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning Sy
 
 + **Photo taking**
 
-  + Implemented photo-taking function with the IPhone camera module to offer the real-time testing data.
+  + Implemented photo-taking function with the iPhone camera module to offer the real-time service.
 
-  + Deigned two frames providing users to preview the photos. Users could take photos repeatedly until they get staisfying photos to anaylize the location.
+  + Designed two viewing frames providing users to preview the photos. Users could take photos repeatedly until they get satisfying photos to predict the location.
 
 ```objc
 -(IBAction)takephoto_1:(id)sender{
@@ -48,12 +48,12 @@ CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning Sy
 }
 ```
 
-+ **Simulation: a 2D picure projected from 3D point cloud model**
-  + Simulated the photo taken from the camera to be a picture projected from 3D point cloud model.
++ **Simulation: a 2D picture projected from 3D point cloud model**
+  + Simulated the photo taken from the camera to be a picture projected from a 3D point cloud model.
 
-  + Implemented simulation in three part of the photo. There are 30%, 70%, and 30% of the picture from top to bottom separately.
+  + Implemented simulation in three segmented part of the photo. There are 30%, 70%, and 30% of the picture from top to bottom separately.
 
-  + Deasigned each segmented part to drop pixels by parameter *dropPixelRate* (30%, 20%, 30%).
+  + Deasigned each segmented parts to drop pixels by the parameter *dropPixelRate* (30%, 20%, 30%).
 
 ```objc
 - (UIImage*)pointCloud:(UIImage*)image{
@@ -125,8 +125,8 @@ CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning Sy
 ```
 
 + **runModelOnFrame**
-  + Input the testing data into the trained model handled by Tensorflow Lite Interpreter.
-  + Receive the testing result from Tensorflow Lite Interpreter and CPS will indicate where the user is on the map.
+  + Input the testing data into Convolutional Neural Network (CNN) model with Tensorflow Lite Interpreter.
+  + Receive the predicting result from Tensorflow Lite Interpreter and CPS will indicate where the user is on the map.
 
 ```objc
 - (void)runModelOnFrame:(CVPixelBufferRef)pixelBuffer {
@@ -159,7 +159,7 @@ CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning Sy
 ![image info](image/demoEnvironment.png)
 
 + Demo Video
-  + By providing photos of two continuous vision at one testing area, CPS will pinpoint the user’s position in the environment. The dark indicator represents the most likely position where the user locates at, while the light indicator represents the second possible user's poisition.
+  + By providing photos of two continuous vision at one area, CPS will pinpoint the user’s position in the environment. The dark indicator represents the most likely user's position, while the light indicator represents the second possible user's.
 
 [![Watch the video](https://i.imgur.com/vRJmHuf.png?1)](https://drive.google.com/file/d/1LGRuJsA-jR51jpUwZw695J9G2o3ogRd4/view?usp=sharing)
 
