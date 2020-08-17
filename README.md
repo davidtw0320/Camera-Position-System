@@ -8,7 +8,7 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 
 ***
 
-## Environment
+## Prerequsite
 
 + Xcode version 11.6
 
@@ -17,7 +17,10 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 ## Key Point
 
 + **Photo taking**
-  + Implemented photo-taking function with the IＰhone camera module to offer the real-time visual recognition.
+
+  + Implemented photo-taking function with the IPhone camera module to offer the real-time testing data.
+
+  + Deigned two frames providing users to preview the photos. Users could take photos repeatedly until they get staisfying photos to anaylize the location.
 
 ```objc
 -(IBAction)takephoto_1:(id)sender{
@@ -44,8 +47,10 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 ```
 
 + **Simulation: a 2D picure projected from 3D point cloud model**
-  + Simulated the photo took from the camera to be a picture projected from 3D point cloud model.
+  + Simulated the photo taken from the camera to be a picture projected from 3D point cloud model.
+
   + Implemented simulation in three part of the photo. There are 30%, 70%, and 30% of the picture from top to bottom separately.
+
   + Deasigned each segmented part to drop pixels by parameter *dropPixelRate* (30%, 20%, 30%).
 
 ```objc
@@ -118,7 +123,9 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 ```
 
 + **runModelOnFrame**
-  + 
+  + Input the testing data into the trained model handled by Tensorflow Lite Interpreter.
+  + Receive the testing result from Tensorflow Lite Interpreter and CPS will indicate where the user is on the map.
+
 ```objc
 - (void)runModelOnFrame:(CVPixelBufferRef)pixelBuffer {
     //setup input and output
