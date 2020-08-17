@@ -353,36 +353,10 @@ AVCaptureStillImageOutput *StillImageOutput;
     
     
     for (int i = 0; i < pixelNum; i++, pCurPtr++){
-        uint8_t* ptr = (uint8_t*)pCurPtr;
-        
-        float ptr1= ptr[1];
-        float ptr2= ptr[2];
-        float ptr3= ptr[3];
-        
-        ptr1 =(ptr1 -103.94)*0.017;//B
-        
-        if(ptr1<=0.5)ptr1=0;
-        else if(0.5<ptr1&&ptr1<1.5)ptr1=1;
-        else if(1.5<=ptr1&&ptr1<=2.5)ptr1=2;
-        else ptr1=3;
-        
-        ptr2 =(ptr2 -116.78)*0.017;//G
-        if(ptr2<=0.5)ptr2=0;
-        else if(0.5<ptr2&&ptr2<1.5)ptr2=1;
-        else if(1.5<=ptr2&&ptr2<=2.5)ptr2=2;
-        else ptr2=3;
-        
-        ptr3 =(ptr3 -123.68)*0.017;//R(0~255)
-        if(ptr3<=0.5)ptr3=0;
-        else if(0.5<ptr3&&ptr3<1.5)ptr3=1;
-        else if(1.5<=ptr3&&ptr3<=2.5)ptr3=2;
-        else ptr3=3;
-        
-        ptr[1]=(uint8_t)ptr1;
-        ptr[2]=(uint8_t)ptr2;
-        ptr[3]=(uint8_t)ptr3;
-        
-        
+        uint8_t* ptr = (uint8_t*) pCurPtr;
+        ptr[1] = [self ptrIs: ptr[1] meanIs:103.94 scaleIs:0.017];
+        ptr[2] = [self ptrIs: ptr[2] meanIs:116.78 scaleIs:0.017];
+        ptr[3] = [self ptrIs: ptr[3] meanIs:123.68 scaleIs:0.017];
     }
     
     // output the image
@@ -398,6 +372,14 @@ AVCaptureStillImageOutput *StillImageOutput;
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
     return resultUIImage;
+}
+
+- (float) ptrIs: (float)ptr meanIs:(float)mean scaleIs:(float)standard{
+    ptr =(ptr-mean)* scale;
+    if(ptr<=0.5) return 0;
+    else if(0.5<ptr&&ptr<1.5) return 1;
+    else if(1.5<=ptr&&ptr<=2.5) return 2;
+    else return 3;
 }
 
 - (UIImage*)pointCloud:(UIImage*)image{
@@ -416,51 +398,21 @@ AVCaptureStillImageOutput *StillImageOutput;
     for (int i = 0; i < pixelNum; i++, pCurPtr++){
         count++;
     }
-    
-    pCurPtr = rgbImageBuf;//initial
+    //initial
+    pCurPtr = rgbImageBuf;
     float rate=0.3;
     int counter=0;
     for (int i = 0; i < pixelNum; i++, pCurPtr++){
         uint8_t* ptr=(uint8_t*)pCurPtr;
         // uppper part clip by rate%
         if(counter<=rate*count){
-            float rate_1=0.3;
-            int value = (arc4random() % 100) + 1;//value range from 1 to 100
-            if(value<(rate_1*100)){
-                for(int j=0;j<1;j++){
-                    uint8_t* ptr_1=(uint8_t*)(ptr);
-                    ptr_1[1] = 0;
-                    ptr_1[2] = 0;
-                    ptr_1[3] = 0;
-                    ptr++;
-                }
-            }
+            [self dropPixelRate:0.3 ptrIs: ptr];
         }
         else if(counter>rate*count&&counter<(1-rate)*count){
-            float rate_2=0.2;
-            int value = (arc4random() % 100) + 1;//value range from 1 to 100
-            if(value<(rate_2*100)){
-                for(int j=0;j<1;j++){
-                    uint8_t* ptr_2=(uint8_t*)(ptr);
-                    ptr_2[1] = 0;
-                    ptr_2[2] = 0;
-                    ptr_2[3] = 0;
-                    ptr++;
-                }
-            }
+            [self dropPixelRate:0.2 ptrIs: ptr];
         }
         else{
-            float rate_3=0.3;
-            int value = (arc4random() % 100) + 1;//value range from 1 to 100
-            if(value<(rate_3*100)){
-                for(int j=0;j<1;j++){
-                    uint8_t* ptr_3=(uint8_t*)(ptr);
-                    ptr_3[1] = 0;
-                    ptr_3[2] = 0;
-                    ptr_3[3] = 0;
-                    ptr++;
-                }
-            }
+            [self dropPixelRate:0.3 ptrIs: ptr];
         }
         counter++;
     }
@@ -478,6 +430,19 @@ AVCaptureStillImageOutput *StillImageOutput;
     CGContextRelease(context);
     CGColorSpaceRelease(colorSpace);
     return resultUIImage;
+}
+
+-(void) dropPixelRate: (float)dropRate ptrIs:(uint8_t*) ptr{
+    int value = (arc4random() % 100) + 1;//value range from 1 to 100
+    if(value<(dropRate * 100)){
+        for(int j=0;j<1;j++){
+            uint8_t* ptr_3= ptr;
+            ptr_3[1] = 0;
+            ptr_3[2] = 0;
+            ptr_3[3] = 0;
+            ptr++;
+        }
+    }
 }
 
 - (AVCaptureVideoOrientation)avOrientationForDeviceOrientation:
@@ -511,11 +476,6 @@ UIImage *image_1;
             image_1=[self reSizeImage:[self image:image rotation:UIImageOrientationRight] toSize:size];
             image_1=[self pointCloud:image_1];
             self->imageView_1.image =image_1;
-            /*testing
-            CVPixelBufferRef pixelBuffer_1 = [self imageToRGBPixelBuffer:[self normalize:image_1]];
-            CFRetain(pixelBuffer_1);
-            [self runModelOnFrame:pixelBuffer_1];
-            CFRelease(pixelBuffer_1);*/
         }
     }];
 }

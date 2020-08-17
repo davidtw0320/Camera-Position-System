@@ -8,7 +8,7 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 
 ***
 
-## Prerequisites
+## Environment
 
 + Xcode version 11.6
 
@@ -16,46 +16,77 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 
 ## Key Point
 
-+ **Segue**
++ **Simulation: a 2D picure projected from 3D point cloud model**
+  + Simulated the photo took from the camera to be a picture projected from 3D point cloud model.
+  + Implemented simulation in three part of the photo. There are 30%, 70%, and 30% of the picture from top to bottom separately.
+  + Deasigned each segmented part to drop pixels by parameter *dropPixelRate* (30%, 20%, 30%).
 
 ```objc
--(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if(imageView_1.image && imageView_2.image){
-        MySecondView *controller =(MySecondView *)segue.destinationViewController; UIImage* merge=[self mergeImage];
-        CVPixelBufferRef pixelBuffer = [self imageToRGBPixelBuffer:[self normalize:merge]]; CFRetain(pixelBuffer);
-        //put data into runModelOnFrame
-        [self runModelOnFrame:pixelBuffer];
-        CFRelease(pixelBuffer);
-        // set up data which has the top testing value and transmit into MySecondView 
-        NSString* Text_1 = [[NSString alloc] initWithFormat:@"%d", firstlabel]; controller.content_1 =Text_1;
+- (UIImage*)pointCloud:(UIImage*)image{
+    ...
+    pCurPtr = rgbImageBuf;
+    float rate = 0.3;
+    int counter = 0;
+    for (int i = 0; i < pixelNum; i++, pCurPtr++){
+        uint8_t* ptr=(uint8_t*)pCurPtr;
+        if(counter <= rate*count){
+            [self dropPixelRate:0.3 ptrIs: ptr];
+        }
+        else if(counter > rate*count && counter<(1-rate)*count){
+            [self dropPixelRate:0.2 ptrIs: ptr];
+        }
+        else{
+            [self dropPixelRate:0.3 ptrIs: ptr];
+        }
+        counter++;
+    }
+    ...
+}
+```
+
+```objc
+-(void) dropPixelRate: (float)dropRate ptrIs:(uint8_t*) ptr{
+    int value = (arc4random() % 100) + 1;
+    if(value < (dropRate * 100)){
+        for(int j=0; j<1; j++){
+            uint8_t* ptr_3= ptr;
+            ptr_3[1] = 0;
+            ptr_3[2] = 0;
+            ptr_3[3] = 0;
+            ptr++;
+        }
     }
 }
 ```
 
 + **Data Normalization**
+  + Make sure that the different features take on similar ranges of values, we normalize the RGB photos before inputting the testing data to the Convolutional Neural Network (CNN).
+  + BGR mean values [103.94, 116.78, 123.68] are subtracted.
+  + Scale: 0.017 is used, instead of the original std values for image preprocessing
 
 ```objc
 - (UIImage*)normalize:(UIImage*)image{
+    ...
+    int pixelNum = imageWidth * imageHeight;
+    uint32_t* pCurPtr = rgbImageBuf;
     for (int i = 0; i < pixelNum; i++, pCurPtr++){
-        // pixel B
-        ptr1 =(ptr1 -103.94)*0.017; 
-        if(ptr1<=0.5)   ptr1=0;
-        else if(0.5<ptr1&&ptr1<1.5) ptr1=1;
-        else if(1.5<=ptr1&&ptr1<=2.5)   ptr1=2;
-        else    ptr1=3;
-        // pixel G
-        ptr2 =(ptr2 -116.78)*0.017;
-        if(ptr2<=0.5)   ptr2=0;
-        else if(0.5<ptr2&&ptr2<1.5) ptr2=1;
-        else if(1.5<=ptr2&&ptr2<=2.5)   ptr2=2;
-        else    ptr2=3;
-        // pixel R
-        ptr3 =(ptr3 -123.68)*0.017;
-        if(ptr3<=0.5)   ptr3=0;
-        else if(0.5<ptr3&&ptr3<1.5) ptr3=1;
-        else if(1.5<=ptr3&&ptr3<=2.5)   ptr3=2;
-        else    ptr3=3;
+        uint8_t* ptr = (uint8_t*) pCurPtr;
+        ptr[1] = [self ptrIs: ptr[1] meanIs:103.94 scaleIs:0.017];
+        ptr[2] = [self ptrIs: ptr[2] meanIs:116.78 scaleIs:0.017];
+        ptr[3] = [self ptrIs: ptr[3] meanIs:123.68 scaleIs:0.017];
     }
+    ...
+    return resultUIImage;
+}
+```
+
+```objc
+- (float) ptrIs: (float)ptr meanIs:(float)mean scaleIs:(float)scale{
+    ptr =(ptr-mean)* scale;
+    if(ptr <= 0.5) return 0;
+    else if(0.5 < ptr && ptr < 1.5) return 1;
+    else if(1.5 <= ptr && ptr <= 2.5) return 2;
+    else return 3;
 }
 ```
 
@@ -93,7 +124,7 @@ CPS (The Camera Position System) applies trained B-CNN model to provide users wi
 ![image info](image/demoEnvironment.png)
 
 + Demo Video
-  + By providing tow photos of continuous vision at one testing area, CPS will point out the user’s position on the map.
+  + By providing photos of two continuous vision at one testing area, CPS will pinpoint the user’s position in the environment. The dark indicator represents the most likely position where the user locates at, while the light indicator represents the second possible user's poisition.
 
 [![Watch the video](https://i.imgur.com/vRJmHuf.png?1)](https://drive.google.com/file/d/1LGRuJsA-jR51jpUwZw695J9G2o3ogRd4/view?usp=sharing)
 
