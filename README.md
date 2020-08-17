@@ -2,7 +2,9 @@
 
 ## Description
 
-CPS (The Camera Position System) applies trained B-CNN model to provide users with real-time service. Users need to take pictures as testing data. Then, CPS discards pixels randomly to simulate training point cloud data, normalize pixels to reduce the noise produced by random environments, and sent data into the Tensorflow interpreter. Finally, CPS predict the location according to testing set of pictures with user-friendly interface.
+CPS (The Camera Position System) combined Convolution Neural Network (CNN) model with IOS camera module to provide users with real-time positioning service. In the begining, users need to take photos of two continuous viewing at one place. Then, CPS merges two photos, normalizes data, and inputs the processed photos to the CNN model with TensorFlow lite interpreter. After gaining the predicting result, CPS will indicator where the user is in the environment.
+
+CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning System. If you want to get  detailed information, please check the [link](https://ieeexplore.ieee.org/abstract/document/9043071).
 
 ![image info](image/description.png)
 
