@@ -159,7 +159,7 @@ CPS is the implementation of 3DVPS: A 3D Point Cloud-Based Visual Positioning Sy
 ![image info](image/demoEnvironment.png)
 
 + Demo Video
-  + By providing photos of two continuous vision in one area, CPS will pinpoint the user’s position in the environment. The dark indicator represents the most likely user's position, while the light indicator represents the second possible user's.
+  + By providing photos of two continuous vision in one area, CPS will pinpoint the user’s position in the environment. The dark indicator represents the most likely user's position, while the light indicator represents the second possible user's position.
 
 [![Watch the video](https://i.imgur.com/vRJmHuf.png?1)](https://drive.google.com/file/d/1LGRuJsA-jR51jpUwZw695J9G2o3ogRd4/view?usp=sharing)
 
